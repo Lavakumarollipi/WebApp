@@ -14,12 +14,7 @@
                     }
                 stage ('Build'){
                     steps {
-                        sh 'mvn clean install'
-                    }
-                }
-                stage ('Package'){
-                    steps {
-                        sh 'mvn clean package'
+                        sh 'mvn clean install package'
                     }
                 }
                 stage('SonarScanner') {
@@ -53,8 +48,7 @@
                         }
                     }
                 stage('Docker Build') {
-                    agent any
-                          steps {
+                    steps{
                           sh 'docker build -t kumarolipi/jenkins-docker .'
                       }
                   }
