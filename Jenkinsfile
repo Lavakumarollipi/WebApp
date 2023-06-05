@@ -12,11 +12,6 @@
                         git branch: 'main', credentialsId: 'ce974fa1-13fe-4145-8212-5452dce5b6f4', url: 'https://github.com/Lavakumarollipi/WebApp.git'
                         }
                     }
-                stage ('Build'){
-                    steps {
-                        sh 'mvn clean install package'
-                    }
-                }
                 stage('SonarScanner') {
                     steps {
                         withSonarQubeEnv('Sonarqube-9.6.1'){
@@ -24,51 +19,6 @@
                         }
                     }
                 }
-                stage ('Package uploading to Jfrog'){
-                steps {
-                   rtServer (
-                     id: "Jfrog-Server",
-                     url: 'http://13.235.68.119:8082/artifactory',
-                     username: 'jenkins',
-                      password: 'Lava143@',
-                      bypassProxy: true,
-                       timeout: 600
-                            )
-                   rtUpload (
-                     serverId:"Jfrog-Server" ,
-                      spec: '''{
-                       "files": [
-                          {
-                          "pattern": "*.war",
-                          "target": "web-app-libs-snapshot-local"
-                          }
-                                ]
-                               }''',
-                            )
-                        }
-                    }
-                stage('Docker Build') {
-                    steps{
-                          sh 'docker build -t kumarolipi/jenkins-docker .'
-                      }
-                  }
-                stage('Docker Push') {
-                        steps{
-                            script{
-                                withCredentials([string(credentialsId: 'Docker-push', variable: 'Docker-push')]) {
-                                sh 'echo "Lasya143@" | docker login -u kumarolipi --password-stdin'
-                            }
-                                sh 'docker push kumarolipi/jenkins-docker'
-
-                      }
-                  }
-               }
-                stage('Deploying App into Kubernetes') {
-                    steps {
-                        script {
-                            kubernetesDeploy(configs: "deploymentservice.yml", kubeconfigId: "kubernetes")
-                                }
-                           }
-                    }
-                }
+               
+            }
         }
